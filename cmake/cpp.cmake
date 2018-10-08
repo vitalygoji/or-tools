@@ -76,8 +76,18 @@ target_include_directories(${PROJECT_NAME} INTERFACE
 	$<INSTALL_INTERFACE:include>
 	)
 target_link_libraries(${PROJECT_NAME} PUBLIC
+	ZLIB::ZLIB
+  absl::base
+  absl::container
+  absl::hash
+  absl::memory
+  absl::meta
+  absl::str_format
+  absl::strings
+  absl::synchronization
+  absl::types
 	gflags::gflags glog::glog
-	ZLIB::ZLIB protobuf::libprotobuf
+  protobuf::libprotobuf
 	Cbc::CbcSolver Cbc::OsiCbc Cbc::ClpSolver Cbc::OsiClp
 	Threads::Threads)
 if(WIN32)
