@@ -435,16 +435,14 @@ rcc_%: $(BIN_DIR)/%$E FORCE
 
 .PHONY: test_cc_tests # Build and Run all C++ tests (located in examples/tests)
 test_cc_tests: \
- rcc_ac4r_table_test \
  rcc_boolean_test \
  rcc_bug_fz1 \
  rcc_cpp11_test \
  rcc_forbidden_intervals_test \
- rcc_gcc_test \
+ rcc_issue173 \
  rcc_issue57 \
  rcc_min_max_test \
  rcc_visitor_test
-#	$(MAKE) rcc_issue173 # error: too long
 
 .PHONY: check_cc_examples # Build and Run few C++ Examples (located in examples/cpp)
 check_cc_examples: \
@@ -471,13 +469,11 @@ test_cc_examples: check_cc_examples \
  rcc_cvrptw_with_refueling \
  rcc_cvrptw_with_resources \
  rcc_cvrptw_with_stop_times_and_resources \
- rcc_dobble_ls \
  rcc_flow_api \
  rcc_linear_assignment_api \
  rcc_linear_solver_protocol_buffers \
  rcc_ls_api \
  rcc_magic_square \
- rcc_mps_driver \
  rcc_nqueens \
  rcc_random_tsp \
  rcc_strawberry_fields_with_column_generation \
@@ -485,6 +481,9 @@ test_cc_examples: check_cc_examples \
 	$(MAKE) run \
  SOURCE=examples/cpp/dimacs_assignment.cc \
  ARGS=examples/data/dimacs/assignment/small.asn
+	$(MAKE) run \
+ SOURCE=examples/cpp/dobble_ls.cc \
+ ARGS="--time_limit_in_ms=10000"
 	$(MAKE) run \
  SOURCE=examples/cpp/flexible_jobshop.cc \
  ARGS="--data_file examples/data/flexible_jobshop/hurink_data/edata/la01.fjs"
@@ -504,19 +503,23 @@ test_cc_examples: check_cc_examples \
  SOURCE=examples/cpp/jobshop_sat.cc \
  ARGS="--input=examples/data/jobshop/ft06"
 	$(MAKE) run \
+ SOURCE=examples/cpp/mps_driver.cc \
+ ARGS="--input examples/data/tests/test.mps"
+	$(MAKE) run \
  SOURCE=examples/cpp/multidim_knapsack.cc \
  ARGS="--data_file examples/data/multidim_knapsack/PB1.DAT"
 	$(MAKE) run \
  SOURCE=examples/cpp/network_routing.cc \
- ARGS="--clients=10 --backbones=5 --demands=10 --traffic_min=5 --traffic_max=10 --min_client_degree=2 --max_client_degree=5 --min_backbone_degree=3 --max_backbone_degree=5 --max_capacity=20 --fixed_charge_cost=10"
+ ARGS="--clients=8 --backbones=4 --demands=10 --traffic_min=5 --traffic_max=10 --min_client_degree=2 --max_client_degree=4 --min_backbone_degree=3 --max_backbone_degree=4 --max_capacity=20 --fixed_charge_cost=10 --time_limit=5000"
+	$(MAKE) run \
+ SOURCE=examples/cpp/solve.cc \
+ ARGS="--input examples/data/tests/test2.mps"
 	$(MAKE) run \
  SOURCE=examples/cpp/sports_scheduling.cc \
  ARGS="--num_teams=8 --time_limit=10000"
 #	$(MAKE) run SOURCE=examples/cpp/frequency_assignment_problem.cc  # Need data file
-#	$(MAKE) run SOURCE=examples/cpp/model_util.cc  # Need data file
 #	$(MAKE) run SOURCE=examples/cpp/pdptw.cc ARGS="--pdp_file examples/data/pdptw/LC1_2_1.txt" # Fails on windows...
 #	$(MAKE) run SOURCE=examples/cpp/shift_minimization_sat.cc  # Port to new API.
-#	$(MAKE) run SOURCE=examples/cpp/solve.cc  # Need data file
 
 .PHONY: test_cc_samples # Build and Run all C++ Samples (located in ortools/*/samples)
 test_cc_samples: \

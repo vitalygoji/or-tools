@@ -15,18 +15,19 @@
 
 #include <cstdio>
 
+#include "absl/container/flat_hash_set.h"
+#include "absl/strings/str_format.h"
+#include "absl/strings/str_split.h"
 #include "ortools/base/commandlineflags.h"
+#include "ortools/base/filelineiter.h"
 #include "ortools/base/file.h"
 #include "ortools/base/hash.h"
 #include "ortools/base/integral_types.h"
 #include "ortools/base/logging.h"
 #include "ortools/base/map_util.h"
-#include "ortools/base/split.h"
-#include "ortools/base/stringprintf.h"
 #include "ortools/base/strtoint.h"
 #include "ortools/constraint_solver/constraint_solver.h"
 #include "ortools/constraint_solver/routing.h"
-#include "ortools/util/filelineiter.h"
 #include "ortools/util/tuple_set.h"
 
 /* Data format
@@ -90,7 +91,7 @@ class AcpData {
 
   void ProcessNewLine(const std::string& line) {
     const std::vector<std::string> words =
-        strings::Split(line, " ", strings::SkipEmpty());
+        absl::StrSplit(line, ' ', absl::SkipEmpty());
     if (words.empty()) return;
     switch (state_) {
       case 0: {
@@ -134,8 +135,8 @@ class AcpData {
   }
 
   std::string DebugString() const {
-    return StringPrintf("AcpData(%d periods, %d products, %d cost)",
-                        num_periods_, num_products_, inventory_cost_);
+    return absl::StrFormat("AcpData(%d periods, %d products, %d cost)",
+                           num_periods_, num_products_, inventory_cost_);
   }
 
   const std::vector<std::vector<int>>& due_dates_per_product() const {
@@ -208,12 +209,12 @@ class RandomIntervalLns : public BaseLns {
         break;
       }
       case 3: {
-        std::unordered_set<int> to_release;
+        absl::flat_hash_set<int> to_release;
         while (to_release.size() < num_product_) {
           to_release.insert(rand_.Uniform(item_to_product_.back() + 1));
         }
         for (int i = 0; i < Size(); ++i) {
-          if (ContainsKey(to_release, item_to_product_[Value(i)])) {
+          if (gtl::ContainsKey(to_release, item_to_product_[Value(i)])) {
             AppendToFragment(i);
           }
         }
@@ -320,15 +321,15 @@ class NRandomSwaps : public IntVarLocalSearchOperator {
   // Make a neighbor assigning one variable to its target value.
   virtual bool MakeOneNeighbor() {
     const int num_swaps = rand_.Uniform(num_swaps_ - 1) + 2;
-    std::unordered_set<int> inserted;
+    absl::flat_hash_set<int> inserted;
     for (int i = 0; i < num_swaps; ++i) {
       int index1 = rand_.Uniform(Size());
-      while (ContainsKey(inserted, index1)) {
+      while (gtl::ContainsKey(inserted, index1)) {
         index1 = rand_.Uniform(Size());
       }
       inserted.insert(index1);
       int index2 = rand_.Uniform(Size());
-      while (ContainsKey(inserted, index2)) {
+      while (gtl::ContainsKey(inserted, index2)) {
         index2 = rand_.Uniform(Size());
       }
       inserted.insert(index2);
@@ -603,13 +604,13 @@ void LoadSolution(const std::string& filename, std::vector<int>* vec) {
   std::string line;
   file->ReadToString(&line, 10000);
   const std::vector<std::string> words =
-      strings::Split(line, " ", strings::SkipEmpty());
+      absl::StrSplit(line, ' ', absl::SkipEmpty());
   LOG(INFO) << "Solution file has " << words.size() << " entries";
   vec->clear();
   for (const std::string& word : words) {
     vec->push_back(atoi32(word));
   }
-  LOG(INFO) << "  - loaded " << strings::Join(*vec, " ");
+  LOG(INFO) << "  - loaded " << absl::StrJoin(*vec, " ");
 }
 
 void Solve(const std::string& filename, const std::string& solution_file) {
@@ -715,7 +716,8 @@ void Solve(const std::string& filename, const std::string& solution_file) {
     for (int j = 0; j < data.due_dates_per_product()[i].size(); ++j) {
       const int due_date = data.due_dates_per_product()[i][j];
       IntVar* const delivery =
-          solver.MakeIntVar(0, due_date, StringPrintf("delivery_%d_%d", i, j));
+          solver.MakeIntVar(0, due_date,
+                            absl::StrFormat("delivery_%d_%d", i, j));
       // if (j > 0) {  // Order deliveries of the same product.
       //   solver.AddConstraint(solver.MakeLess(deliveries.back(), delivery));
       // }
@@ -765,7 +767,7 @@ void Solve(const std::string& filename, const std::string& solution_file) {
                                 solver.MakeIsEqualCstVar(products[0], -1)));
 
   // Redundant due date constraints on non variables.
-  std::unordered_set<int> due_date_set(due_dates.begin(), due_dates.end());
+  absl::flat_hash_set<int> due_date_set(due_dates.begin(), due_dates.end());
   for (const int due_date : due_date_set) {
     std::vector<IntVar*> outside;
     int inside_count = 0;
@@ -851,7 +853,7 @@ void Solve(const std::string& filename, const std::string& solution_file) {
   if (solution.empty()) {
     ls_db = solver.MakeLocalSearchPhase(items, db, ls_params);
   } else {
-    vector<int> offsets(data.num_products() + 1, 0);
+    std::vector<int> offsets(data.num_products() + 1, 0);
     for (int i = 0; i < data.num_products(); ++i) {
       offsets[i + 1] = offsets[i] + data.due_dates_per_product()[i].size();
     }
@@ -869,9 +871,9 @@ void Solve(const std::string& filename, const std::string& solution_file) {
   solver.NewSearch(ls_db, objective, log);
   while (solver.NextSolution()) {
     // for (int p = 0; p < data.num_periods(); ++p) {
-    //   LOG(INFO) << StringPrintf("%d: %d %d - %s", p, items[p]->Value(),
-    //                             products[p]->Value(),
-    //                             states[p]->DebugString().c_str());
+    //   LOG(INFO) << absl::StrFormat("%d: %d %d - %s", p, items[p]->Value(),
+    //                                products[p]->Value(),
+    //                                states[p]->DebugString().c_str());
     // }
 
     // for (int i = 0; i < num_items; ++i) {
@@ -883,7 +885,7 @@ void Solve(const std::string& filename, const std::string& solution_file) {
 
     std::string result;
     for (int p = 0; p < data.num_periods(); ++p) {
-      result += StringPrintf("%" GG_LL_FORMAT "d ", products[p]->Value());
+      result += absl::StrFormat("%d ", products[p]->Value());
     }
     LOG(INFO) << result;
   }

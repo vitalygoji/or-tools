@@ -13,6 +13,9 @@
 
 #ifndef EXAMPLES_GLOBAL_ARITH_H_
 #define EXAMPLES_GLOBAL_ARITH_H_
+
+#include "absl/container/flat_hash_map.h"
+
 namespace operations_research {
 class ArithmeticPropagator;
 class ArithmeticConstraint;
@@ -72,9 +75,9 @@ class GlobalArithmeticConstraint : public Constraint {
   int VarIndex(IntVar* const var);
   ConstraintRef Store(ArithmeticConstraint* const constraint);
 
-  scoped_ptr<ArithmeticPropagator> propagator_;
-  std::unordered_map<IntVar*, int> var_indices_;
-  vector<ArithmeticConstraint*> constraints_;
+  std::scoped_ptr<ArithmeticPropagator> propagator_;
+  absl::flat_hash_map<IntVar*, int> var_indices_;
+  std::vector<ArithmeticConstraint*> constraints_;
 };
 
 }  // namespace operations_research

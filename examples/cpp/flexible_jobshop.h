@@ -35,32 +35,34 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <sstream>
+#include <string>
 
+#include "absl/strings/str_format.h"
+#include "absl/strings/str_split.h"
 #include "ortools/base/filelineiter.h"
 #include "ortools/base/integral_types.h"
 #include "ortools/base/logging.h"
-#include "ortools/base/split.h"
-#include "ortools/base/stringprintf.h"
 #include "ortools/base/strtoint.h"
-#include "ortools/util/string_array.h"
 
 namespace operations_research {
+
 // A FlexibleJobShopData parses data files and stores all data internally for
 // easy retrieval.
 class FlexibleJobShopData {
  public:
   // A task is the basic block of a jobshop.
-  // The diference in a flexible jobshop is that a task has a list of machine
+  // The difference in a flexible jobshop is that a task has a list of machine
   // on which it can be scheduled (with possibly not the same duration).
   struct Task {
     Task(int j, const std::vector<int>& m, const std::vector<int>& d)
         : job_id(j), machines(m), durations(d) {}
 
     std::string DebugString() const {
-      std::string out = StringPrintf("Job %d Task(", job_id);
+      std::string out = absl::StrFormat("Job %d Task(", job_id);
       for (int k = 0; k < machines.size(); ++k) {
         if (k > 0) out.append(" | ");
-        out.append(StringPrintf("<m%d,%d>", machines[k], durations[k]));
+        out.append(absl::StrFormat("<m%d,%d>", machines[k], durations[k]));
       }
       out.append(")");
       return out;
@@ -117,10 +119,10 @@ class FlexibleJobShopData {
 
   std::string DebugString() const {
     std::string out =
-        StringPrintf("FlexibleJobshop(name = %s, %d machines, %d jobs)\n",
-                     name_.c_str(), machine_count_, job_count_);
+        absl::StrFormat("FlexibleJobshop(name = %s, %d machines, %d jobs)\n",
+                        name_, machine_count_, job_count_);
     for (int j = 0; j < all_tasks_.size(); ++j) {
-      out.append(StringPrintf("  job %d: ", j));
+      out.append(absl::StrFormat("  job %d: ", j));
       for (int k = 0; k < all_tasks_[j].size(); ++k) {
         out.append(all_tasks_[j][k].DebugString());
         if (k < all_tasks_[j].size() - 1) {
@@ -136,30 +138,36 @@ class FlexibleJobShopData {
  private:
   void ProcessNewLine(const std::string& line) {
     const std::vector<std::string> words =
-        absl::StrSplit(line, ' ', absl::SkipEmpty());
+        absl::StrSplit(line, ' ', absl::SkipWhitespace());
     if (machine_count_ == -1 && words.size() > 1) {
       job_count_ = atoi32(words[0]);
       machine_count_ = atoi32(words[1]);
       CHECK_GT(machine_count_, 0);
       CHECK_GT(job_count_, 0);
-      LOG(INFO) << machine_count_ << " machines and " << job_count_ << " jobs";
+      LOG(INFO) << "jobs: " << job_count_ << ", machines: " << machine_count_;
       all_tasks_.resize(job_count_);
     } else if (words.size() > 1) {
       const int operations_count = atoi32(words[0]);
+      LOG(INFO) << "operations: "<< operations_count;
       int index = 1;
       for (int operation = 0; operation < operations_count; ++operation) {
         std::vector<int> machines;
         std::vector<int> durations;
         const int alternatives_count = atoi32(words[index++]);
+        LOG(INFO) << "alternatives: " << alternatives_count;
         for (int alt = 0; alt < alternatives_count; alt++) {
           // Machine id are 1 based.
           const int machine_id = atoi32(words[index++]) - 1;
           const int duration = atoi32(words[index++]);
+          CHECK_LT(machine_id, machine_count_);
+          CHECK_GT(duration, 0);
           machines.push_back(machine_id);
           durations.push_back(duration);
+          LOG(INFO) << "machine: "<< machine_id << ", duration: " << duration;
         }
         AddTask(current_job_index_, machines, durations);
       }
+      CHECK_EQ(index, words.size());
       current_job_index_++;
     }
   }

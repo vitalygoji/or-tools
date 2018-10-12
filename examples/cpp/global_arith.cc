@@ -36,7 +36,7 @@ class SubstitutionMap {
   }
 
   void ProcessAllSubstitutions(Callback3<int, int, int64>* const hook) {
-    for (std::unordered_map<int, Offset>::const_iterator it =
+    for (absl::flat_hash_map<int, Offset>::const_iterator it =
              substitutions_.begin();
          it != substitutions_.end(); ++it) {
       hook->Run(it->first, it->second.var_index, it->second.offset);
@@ -44,7 +44,7 @@ class SubstitutionMap {
   }
 
  private:
-  std::unordered_map<int, Offset> substitutions_;
+  absl::flat_hash_map<int, Offset> substitutions_;
 };
 
 // ----- Bounds -----
@@ -87,7 +87,7 @@ class BoundsStore {
       : initial_bounds_(initial_bounds) {}
 
   void SetRange(int var_index, int64 lb, int64 ub) {
-    std::unordered_map<int, Bounds>::iterator it =
+    absl::flat_hash_map<int, Bounds>::iterator it =
         modified_bounds_.find(var_index);
     if (it == modified_bounds_.end()) {
       Bounds new_bounds(lb, ub);
@@ -103,14 +103,14 @@ class BoundsStore {
 
   void Clear() { modified_bounds_.clear(); }
 
-  const std::unordered_map<int, Bounds>& modified_bounds() const {
+  const absl::flat_hash_map<int, Bounds>& modified_bounds() const {
     return modified_bounds_;
   }
 
   vector<Bounds>* initial_bounds() const { return initial_bounds_; }
 
   void Apply() {
-    for (std::unordered_map<int, Bounds>::const_iterator it =
+    for (absl::flat_hash_map<int, Bounds>::const_iterator it =
              modified_bounds_.begin();
          it != modified_bounds_.end(); ++it) {
       (*initial_bounds_)[it->first] = it->second;
@@ -119,7 +119,7 @@ class BoundsStore {
 
  private:
   vector<Bounds>* initial_bounds_;
-  std::unordered_map<int, Bounds> modified_bounds_;
+  absl::flat_hash_map<int, Bounds> modified_bounds_;
 };
 
 // ----- ArithmeticConstraint -----
@@ -181,7 +181,7 @@ class ArithmeticPropagator : PropagationBaseObject {
   const vector<IntVar*> vars() const { return vars_; }
 
   int VarIndex(IntVar* const var) {
-    std::unordered_map<IntVar*, int>::const_iterator it = var_map_.find(var);
+    absl::flat_hash_map<IntVar*, int>::const_iterator it = var_map_.find(var);
     if (it == var_map_.end()) {
       const int index = var_map_.size();
       var_map_[var] = index;
@@ -224,12 +224,12 @@ class ArithmeticPropagator : PropagationBaseObject {
  private:
   Demon* const demon_;
   vector<IntVar*> vars_;
-  std::unordered_map<IntVar*, int> var_map_;
+  absl::flat_hash_map<IntVar*, int> var_map_;
   vector<ArithmeticConstraint*> constraints_;
   vector<Bounds> bounds_;
   vector<vector<int> > dependencies_;  // from var indices to constraints.
   SubstitutionMap substitution_map_;
-  std::unordered_set<int> protected_constraints_;
+  absl::flat_hash_set<int> protected_constraints_;
 };
 
 // ----- Custom Constraints -----
@@ -247,10 +247,10 @@ class RowConstraint : public ArithmeticConstraint {
   virtual bool Propagate(BoundsStore* const store) { return true; }
 
   virtual void Replace(int to_replace, int var, int64 offset) {
-    std::unordered_map<int, int64>::iterator find_other =
+    absl::flat_hash_map<int, int64>::iterator find_other =
         coefficients_.find(to_replace);
     if (find_other != coefficients_.end()) {
-      std::unordered_map<int, int64>::iterator find_var =
+      absl::flat_hash_map<int, int64>::iterator find_var =
           coefficients_.find(var);
       const int64 other_coefficient = find_other->second;
       if (lb_ != kint64min) {
@@ -274,7 +274,7 @@ class RowConstraint : public ArithmeticConstraint {
   virtual bool Deduce(ArithmeticPropagator* const propagator) const {
     // Deduce Simple translation from one var to another.
     if (lb_ == ub_ && coefficients_.size() == 2) {
-      std::unordered_map<int, int64>::const_iterator it = coefficients_.begin();
+      absl::flat_hash_map<int, int64>::const_iterator it = coefficients_.begin();
       const int var1 = it->first;
       const int64 coeff1 = it->second;
       ++it;
@@ -296,7 +296,7 @@ class RowConstraint : public ArithmeticConstraint {
   virtual string DebugString() const {
     string output = "(";
     bool first = true;
-    for (std::unordered_map<int, int64>::const_iterator it =
+    for (absl::flat_hash_map<int, int64>::const_iterator it =
              coefficients_.begin();
          it != coefficients_.end(); ++it) {
       if (it->second != 0) {
@@ -333,7 +333,7 @@ class RowConstraint : public ArithmeticConstraint {
   }
 
  private:
-  std::unordered_map<int, int64> coefficients_;
+  absl::flat_hash_map<int, int64> coefficients_;
   int64 lb_;
   int64 ub_;
 };
@@ -521,7 +521,7 @@ void GlobalArithmeticConstraint::Add(ConstraintRef ref) {
 }
 
 int GlobalArithmeticConstraint::VarIndex(IntVar* const var) {
-  std::unordered_map<IntVar*, int>::const_iterator it = var_indices_.find(var);
+  absl::flat_hash_map<IntVar*, int>::const_iterator it = var_indices_.find(var);
   if (it == var_indices_.end()) {
     const int new_index = var_indices_.size();
     var_indices_.insert(make_pair(var, new_index));

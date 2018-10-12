@@ -17,15 +17,13 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include "absl/strings/str_split.h"
 #include "ortools/base/commandlineflags.h"
 #include "ortools/base/filelineiter.h"
 #include "ortools/base/integral_types.h"
 #include "ortools/base/logging.h"
-#include "ortools/base/split.h"
-#include "ortools/base/stringprintf.h"
 #include "ortools/base/strtoint.h"
 #include "ortools/constraint_solver/constraint_solver.h"
-#include "ortools/constraint_solver/hybrid.h"
 
 DEFINE_string(
     data_file, "",
@@ -34,9 +32,6 @@ DEFINE_string(
     "  - http://elib.zib.de/pub/Packages/mp-testdata/ip/sac94-suite/readme\n"
     "  - http://hces.bus.olemiss.edu/tools.html\n");
 DEFINE_int32(time_limit_in_ms, 0, "Time limit in ms, <= 0 means no limit.");
-DEFINE_int32(simplex_frequency, 0,
-             "Number of nodes explored between each"
-             " call to the simplex optimizer.");
 DEFINE_bool(display_search_log, true, "Display search log.");
 
 namespace operations_research {
@@ -310,12 +305,6 @@ void SolveKnapsack(MultiDimKnapsackData* const data) {
     SearchLimit* const limit = solver.MakeLimit(
         FLAGS_time_limit_in_ms, kint64max, kint64max, kint64max);
     monitors.push_back(limit);
-  }
-
-  if (FLAGS_simplex_frequency > 0) {
-    SearchMonitor* const simplex =
-        MakeSimplexConstraint(&solver, FLAGS_simplex_frequency);
-    monitors.push_back(simplex);
   }
 
   if (solver.Solve(db, monitors)) {
