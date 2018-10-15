@@ -522,7 +522,6 @@ test_python_examples: \
  rpy_assignment_with_constraints \
  rpy_assignment_with_constraints_sat \
  rpy_bacp \
- rpy_balance_group_sat \
  rpy_blending \
  rpy_broken_weights \
  rpy_bus_schedule \
@@ -648,7 +647,6 @@ test_python_examples: \
  rpy_slitherlink \
  rpy_stable_marriage \
  rpy_steel_lns \
- rpy_steel_mill_slab_sat \
  rpy_steel \
  rpy_stigler \
  rpy_strimko2 \
@@ -668,10 +666,17 @@ test_python_examples: \
  rpy_wedding_optimal_chart \
  rpy_wedding_optimal_chart_sat \
  rpy_who_killed_agatha \
+ rpy_word_square \
  rpy_worker_schedule_sat \
  rpy_xkcd \
  rpy_young_tableaux \
  rpy_zebra
+	$(MAKE) run \
+ SOURCE=examples/python/steel_mill_slab_sat.py \
+ ARGS="--problem 3"
+	$(MAKE) run \
+ SOURCE=examples/python/balance_group_sat.py \
+ ARGS="--size 6"
 	$(MAKE) run \
  SOURCE=examples/python/coins_grid.py \
  ARGS="5 2"
@@ -682,7 +687,6 @@ test_python_examples: \
 #	$(MAKE) rpy_nontransitive_dice # error: too long
 #	$(MAKE) rpy_school_scheduling_sat # error: too long
 #	$(MAKE) rpy_secret_santa # error: too long
-#	$(MAKE) rpy_word_square # Not working on window since it rely on /usr/share/dict/words
 
 .PHONY: test_python_samples # Run all Python Samples (located in ortools/*/python)
 test_python_samples: \

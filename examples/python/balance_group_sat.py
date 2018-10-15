@@ -21,7 +21,17 @@ be in that group.
 from __future__ import print_function
 from __future__ import division
 
+import argparse
+
 from ortools.sat.python import cp_model
+
+
+PARSER = argparse.ArgumentParser()
+
+PARSER.add_argument(
+    '--size', default=10, type=int,
+    help='Number of groups (number of persons will be size^2).')
+
 
 
 # Create a solution printer.
@@ -65,10 +75,9 @@ class SolutionPrinter(cp_model.CpSolverSolutionCallback):
     return self.__solution_count
 
 
-def main():
+def main(num_groups):
   # Data.
-  num_groups = 10
-  num_items = 100
+  num_items = num_groups * num_groups
   num_colors = 3
   min_items_of_same_color_per_group = 4
 
@@ -176,4 +185,5 @@ def main():
 
 
 if __name__ == '__main__':
-  main()
+  args = PARSER.parse_args()
+  main(args.size)

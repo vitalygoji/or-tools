@@ -17,6 +17,7 @@
 from __future__ import print_function
 from ortools.constraint_solver import pywrapcp
 
+
 def main():
   """Entry point of the program"""
   solver = pywrapcp.Solver('ConstraintExample')
@@ -33,7 +34,8 @@ def main():
   print('Number of constraints =', solver.Constraints())
 
   # Call the solver.
-  decision_builder = solver.Phase([x, y, z], solver.CHOOSE_FIRST_UNBOUND, solver.ASSIGN_MIN_VALUE)
+  decision_builder = solver.Phase([x, y, z], solver.CHOOSE_FIRST_UNBOUND,
+                                  solver.ASSIGN_MIN_VALUE)
   solver.NewSearch(decision_builder)
   while solver.NextSolution():
     solution = 'Solution:'
@@ -41,11 +43,12 @@ def main():
       solution += ' {} = {};'.format(var.Name(), var.Value())
     print(solution)
   solver.EndSearch()
-  print("Number of solutions found:", solver.Solutions())
+  print('Number of solutions found:', solver.Solutions())
   print('')
   print('Advanced usage:')
   print('Problem solved in ', solver.WallTime(), ' milliseconds')
   print('Memory usage: ', pywrapcp.Solver.MemoryUsage(), ' bytes')
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
   main()

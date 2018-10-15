@@ -74,12 +74,14 @@ def main():
 
   # Solve model.
   solver = cp_model.CpSolver()
+  solver.parameters.linearization_level=0
   status = solver.Solve(model)
 
   # Output solution.
   if status == cp_model.OPTIMAL:
     if visualization.RunFromIPython():
-      starts = [[solver.Value(all_tasks[(i, j)][0]) for j in all_machines]
+      starts = [[solver.Value(all_tasks[(i, j)][0])
+                 for j in all_machines]
                 for i in all_jobs]
       visualization.DisplayJobshop(starts, durations, machines, 'FT06')
     else:

@@ -17,10 +17,12 @@
 from __future__ import print_function
 from ortools.linear_solver import pywraplp
 
+
 def main():
   """Entry point of the program"""
   # Instantiate a Glop solver, naming it LinearExample.
-  solver = pywraplp.Solver('LinearExample', pywraplp.Solver.GLOP_LINEAR_PROGRAMMING)
+  solver = pywraplp.Solver('LinearExample',
+                           pywraplp.Solver.GLOP_LINEAR_PROGRAMMING)
 
   # Create the two variables and let them take on any value.
   x = solver.NumVar(-solver.infinity(), solver.infinity(), 'x')
@@ -54,7 +56,7 @@ def main():
   status = solver.Solve()
   # Check that the problem has an optimal solution.
   if status != pywraplp.Solver.OPTIMAL:
-    print("The problem does not have an optimal solution!")
+    print('The problem does not have an optimal solution!')
     exit(1)
 
   print('Solution:')
@@ -68,12 +70,13 @@ def main():
   print('x: reduced cost =', x.reduced_cost())
   print('y: reduced cost =', y.reduced_cost())
   activities = solver.ComputeConstraintActivities()
-  print('constraint0: dual value =', constraint0.dual_value(),
-        ' activities =', activities[constraint0.index()])
-  print('constraint1: dual value =', constraint1.dual_value(),
-        ' activities =', activities[constraint1.index()])
-  print('constraint2: dual value =', constraint2.dual_value(),
-        ' activities =', activities[constraint2.index()])
+  print('constraint0: dual value =', constraint0.dual_value(), ' activities =',
+        activities[constraint0.index()])
+  print('constraint1: dual value =', constraint1.dual_value(), ' activities =',
+        activities[constraint1.index()])
+  print('constraint2: dual value =', constraint2.dual_value(), ' activities =',
+        activities[constraint2.index()])
+
 
 if __name__ == '__main__':
   main()

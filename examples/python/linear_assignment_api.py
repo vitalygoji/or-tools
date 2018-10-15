@@ -23,6 +23,7 @@ from ortools.graph import pywrapgraph
 
 def RunAssignmentOn4x4Matrix():
   """Test linear sum assignment on a 4x4 matrix.
+
   """
   num_sources = 4
   num_targets = 4

@@ -24,14 +24,15 @@ from google.protobuf import text_format
 from ortools.data import pywraprcpsp
 from ortools.sat.python import cp_model
 
-Parser=argparse.ArgumentParser()
-Parser.add_argument('--input', default = "",
-                    help = 'Input file to parse and solve.')
-Parser.add_argument('--output_proto', default = "",
-                    help = 'Output file to write the cp_model'
-                           'proto to.')
-Parser.add_argument('--params', default = "",
-                    help = 'Sat solver parameters.')
+Parser = argparse.ArgumentParser()
+Parser.add_argument(
+    '--input', default='', help='Input file to parse and solve.')
+Parser.add_argument(
+    '--output_proto',
+    default='',
+    help='Output file to write the cp_model'
+    'proto to.')
+Parser.add_argument('--params', default='', help='Sat solver parameters.')
 
 
 class SolutionPrinter(cp_model.CpSolverSolutionCallback):

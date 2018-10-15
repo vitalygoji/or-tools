@@ -84,7 +84,6 @@ def main():
   vendors_stat = []
   hours_stat = []
 
-
   # Auxiliary data
   min_vendors = [t // max_traffic_per_vendor for t in traffic]
   all_vendors = range(num_vendors)
@@ -114,7 +113,7 @@ def main():
   # Statistics and constraints for each hour
   #
   for h in all_hours:
-    workers = model.NewIntVar(0, 1000, 'workers[%i]' %h)
+    workers = model.NewIntVar(0, 1000, 'workers[%i]' % h)
     model.Add(workers == sum(x[v, h] for v in all_vendors))
     hours_stat.append(workers)
     model.Add(workers * max_traffic_per_vendor >= traffic[h])

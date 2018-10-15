@@ -12,8 +12,10 @@
 # limitations under the License.
 
 from __future__ import print_function
+
 import argparse
 import time
+
 from ortools.sat.python import cp_model
 from ortools.linear_solver import pywraplp
 
@@ -34,6 +36,7 @@ PARSER.add_argument(
     '--output_proto',
     default='',
     help='Output file to write the cp_model proto to.')
+
 
 def BuildProblem(problem_id):
   """Build problem data."""
@@ -254,6 +257,7 @@ def BuildProblem(problem_id):
 
   return (num_slabs, capacities, num_colors, orders)
 
+
 class SteelMillSlabSolutionPrinter(cp_model.CpSolverSolutionCallback):
   """Print intermediate solutions."""
 
@@ -287,6 +291,7 @@ class SteelMillSlabSolutionPrinter(cp_model.CpSolverSolutionCallback):
         line += ']'
         print(line)
 
+
 class SolutionPrinterWithObjective(cp_model.CpSolverSolutionCallback):
   """Print intermediate solutions."""
 
@@ -301,6 +306,7 @@ class SolutionPrinterWithObjective(cp_model.CpSolverSolutionCallback):
           (self.__solution_count, current_time - self.__start_time,
            self.ObjectiveValue()))
     self.__solution_count += 1
+
 
 def SteelMillSlab(problem, break_symmetries, output_proto):
   """Solves the Steel Mill Slab Problem."""
@@ -440,6 +446,7 @@ def SteelMillSlab(problem, break_symmetries, output_proto):
   else:
     print('No solution')
 
+
 class AllSolutionsCollector(cp_model.CpSolverSolutionCallback):
   """Collect all solutions callback."""
 
@@ -454,6 +461,7 @@ class AllSolutionsCollector(cp_model.CpSolverSolutionCallback):
 
   def AllSolutions(self):
     return self.__solutions
+
 
 def CollectValidSlabs(capacities, colors, widths, loss_array, all_colors):
   """Collect valid columns (assign, loss) for one slab."""
@@ -494,6 +502,7 @@ def CollectValidSlabs(capacities, colors, widths, loss_array, all_colors):
   solver.SearchForAllSolutions(model, collector)
   print('Collect Valid Slabs...DONE')
   return collector.AllSolutions()
+
 
 def SteelMillSlabWithValidSlabs(problem, break_symmetries, output_proto):
   """Solves the Steel Mill Slab Problem."""
@@ -626,6 +635,7 @@ def SteelMillSlabWithValidSlabs(problem, break_symmetries, output_proto):
   else:
     print('No solution')
 
+
 def SteelMillSlabWithColumnGeneration(problem, output_proto):
   """Solves the Steel Mill Slab Problem."""
   ### Load problem.
@@ -698,6 +708,7 @@ def SteelMillSlabWithColumnGeneration(problem, output_proto):
   else:
     print('No solution')
 
+
 def SteelMillSlabWithMipColumnGeneration(problem):
   """Solves the Steel Mill Slab Problem."""
   ### Load problem.
@@ -761,8 +772,9 @@ def SteelMillSlabWithMipColumnGeneration(problem):
   else:
     print('No solution')
 
+
 def main(args):
-  '''Main function'''
+  """Main function"""
   if args.solver == 'sat':
     SteelMillSlab(args.problem, args.break_symmetries, args.output_proto)
   elif args.solver == 'sat_table':
@@ -772,6 +784,7 @@ def main(args):
     SteelMillSlabWithColumnGeneration(args.problem, args.output_proto)
   else:  # 'mip_column'
     SteelMillSlabWithMipColumnGeneration(args.problem)
+
 
 if __name__ == '__main__':
   main(PARSER.parse_args())

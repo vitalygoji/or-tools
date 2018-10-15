@@ -120,11 +120,11 @@ def RunAllIntegerExampleCppStyleAPI():
   if hasattr(pywraplp.Solver, 'GUROBI_MIXED_INTEGER_PROGRAMMING'):
     Announce('GUROBI', 'C++ style API')
     RunIntegerExampleCppStyleAPI(
-      pywraplp.Solver.GUROBI_MIXED_INTEGER_PROGRAMMING)
+        pywraplp.Solver.GUROBI_MIXED_INTEGER_PROGRAMMING)
   if hasattr(pywraplp.Solver, 'CPLEX_MIXED_INTEGER_PROGRAMMING'):
     Announce('CPLEX', 'C++ style API')
     RunIntegerExampleCppStyleAPI(
-      pywraplp.Solver.CPLEX_MIXED_INTEGER_PROGRAMMING)
+        pywraplp.Solver.CPLEX_MIXED_INTEGER_PROGRAMMING)
 
 
 def main():
