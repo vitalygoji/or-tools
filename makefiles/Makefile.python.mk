@@ -204,14 +204,6 @@ $(GEN_DIR)/ortools/constraint_solver/search_limit_pb2.py: \
 	$(PROTOC) --proto_path=$(INC_DIR) --python_out=$(GEN_PATH) \
  $(SRC_DIR)$Sortools$Sconstraint_solver$Ssearch_limit.proto
 
-$(GEN_DIR)/ortools/constraint_solver/model_pb2.py: \
- $(SRC_DIR)/ortools/constraint_solver/model.proto \
- $(GEN_DIR)/ortools/constraint_solver/search_limit_pb2.py \
- $(PROTOBUF_PYTHON_DESC) \
- | $(GEN_DIR)/ortools/constraint_solver
-	$(PROTOC) --proto_path=$(INC_DIR) --python_out=$(GEN_PATH) \
- $(SRC_DIR)$Sortools$Sconstraint_solver$Smodel.proto
-
 $(GEN_DIR)/ortools/constraint_solver/assignment_pb2.py: \
  $(SRC_DIR)/ortools/constraint_solver/assignment.proto \
  $(PROTOBUF_PYTHON_DESC) \
@@ -250,13 +242,11 @@ $(GEN_DIR)/ortools/constraint_solver/pywrapcp.py: \
  $(SRC_DIR)/ortools/constraint_solver/constraint_solver.h \
  $(SRC_DIR)/ortools/constraint_solver/constraint_solveri.h \
  $(GEN_DIR)/ortools/constraint_solver/assignment_pb2.py \
- $(GEN_DIR)/ortools/constraint_solver/model_pb2.py \
  $(GEN_DIR)/ortools/constraint_solver/routing_enums_pb2.py \
  $(GEN_DIR)/ortools/constraint_solver/routing_parameters_pb2.py \
  $(GEN_DIR)/ortools/constraint_solver/search_limit_pb2.py \
  $(GEN_DIR)/ortools/constraint_solver/solver_parameters_pb2.py \
  $(GEN_DIR)/ortools/constraint_solver/assignment.pb.h \
- $(GEN_DIR)/ortools/constraint_solver/model.pb.h \
  $(GEN_DIR)/ortools/constraint_solver/search_limit.pb.h \
  $(CP_LIB_OBJS) \
  $(PROTOBUF_PYTHON_DESC) \
@@ -517,25 +507,6 @@ test_python_tests: \
  rpy_test_cp_api \
  rpy_test_lp_api
 
-.PHONY: test_python_samples # Run all Python Samples (located in ortools/*/python)
-test_python_samples: \
- rpy_binpacking_problem \
- rpy_bool_or_sample \
- rpy_channeling_sample \
- rpy_code_sample \
- rpy_interval_sample \
- rpy_literal_sample \
- rpy_no_overlap_sample \
- rpy_optional_interval_sample \
- rpy_rabbits_and_pheasants \
- rpy_ranking_sample \
- rpy_reified_sample \
- rpy_simple_solve \
- rpy_solve_all_solutions \
- rpy_solve_with_intermediate_solutions \
- rpy_solve_with_time_limit \
- rpy_stop_after_n_solutions
-
 .PHONY: test_python_examples # Run all Python Examples (located in examples/python)
 test_python_examples: \
  rpy_3_jugs_mip \
@@ -701,14 +672,36 @@ test_python_examples: \
  rpy_xkcd \
  rpy_young_tableaux \
  rpy_zebra
-	$(MAKE) run SOURCE=examples/python/coins_grid.py ARGS="5 2"
-	$(MAKE) run SOURCE=examples/python/hidato.py ARGS="3 3"
+	$(MAKE) run \
+ SOURCE=examples/python/coins_grid.py \
+ ARGS="5 2"
+	$(MAKE) run \
+ SOURCE=examples/python/hidato.py \
+ ARGS="3 3"
 #	$(MAKE) rpy_cvrptw_plot # error: py3 failure, missing numpy.
 #	$(MAKE) rpy_nontransitive_dice # error: too long
-# warning: nurse_sat take 18s
 #	$(MAKE) rpy_school_scheduling_sat # error: too long
 #	$(MAKE) rpy_secret_santa # error: too long
 #	$(MAKE) rpy_word_square # Not working on window since it rely on /usr/share/dict/words
+
+.PHONY: test_python_samples # Run all Python Samples (located in ortools/*/python)
+test_python_samples: \
+ rpy_binpacking_problem \
+ rpy_bool_or_sample \
+ rpy_channeling_sample \
+ rpy_code_sample \
+ rpy_interval_sample \
+ rpy_literal_sample \
+ rpy_no_overlap_sample \
+ rpy_optional_interval_sample \
+ rpy_rabbits_and_pheasants \
+ rpy_ranking_sample \
+ rpy_reified_sample \
+ rpy_simple_solve \
+ rpy_solve_all_solutions \
+ rpy_solve_with_intermediate_solutions \
+ rpy_solve_with_time_limit \
+ rpy_stop_after_n_solutions
 
 ################
 ##  Cleaning  ##
